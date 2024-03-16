@@ -25,13 +25,14 @@ public final class AdvancementRace extends JavaPlugin implements Listener {
 
     boolean gameStarted = false;
 
-    AdvRaceScoreboard scoreboardThingy = new AdvRaceScoreboard(points);
+    AdvRaceScoreboard scoreboardThingy;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
         PluginManager pm = this.getServer().getPluginManager();
         pm.registerEvents(this, this);
+        scoreboardThingy = new AdvRaceScoreboard(points);
 
         System.out.println("AdvancementRace has been enabled!");
     }
