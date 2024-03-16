@@ -1,5 +1,8 @@
 package org.crystaltine.advancementrace;
 
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -15,6 +18,7 @@ import org.bukkit.plugin.PluginManager;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Objects;
 
 public final class AdvancementRace extends JavaPlugin implements Listener {
 
@@ -54,21 +58,28 @@ public final class AdvancementRace extends JavaPlugin implements Listener {
             for (String s : e.getPlayer().getAdvancementProgress(e.getAdvancement()).getAwardedCriteria()) {
                 e.getPlayer().getAdvancementProgress(e.getAdvancement()).revokeCriteria(s);
             }
+            return;
         }
+
+        TextComponent advancement = new TextComponent("[" + Objects.requireNonNull(e.getAdvancement().getDisplay()).getTitle() + "]");
+        advancement.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                new ComponentBuilder(e.getAdvancement().getDisplay().getTitle() + "\n" + e.getAdvancement().getDisplay().getDescription()).create()));
 
         // If the advancement has already been completed
         if (completedAdvs.contains(e.getAdvancement())) {
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                p.sendMessage(e.getPlayer().getDisplayName() + " has completed the already-obtained advancement " + ChatColor.GREEN + "[" + e.getAdvancement().getDisplay() + "]");
-            }
+            TextComponent alreadyCompleted = new TextComponent(e.getPlayer().getDisplayName() + " has completed the already-obtained advancement ");
+            advancement.setColor(net.md_5.bungee.api.ChatColor.GREEN);
+            alreadyCompleted.addExtra(advancement);
+            getServer().spigot().broadcast(alreadyCompleted);
             return;
         }
 
         // Else, that means the advancement has not been completed
         completedAdvs.add(e.getAdvancement());
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            p.sendMessage( e.getPlayer().getDisplayName() + " has become the first to complete the advancement " + ChatColor.LIGHT_PURPLE + "[" + e.getAdvancement().getDisplay() + "]");
-        }
+        TextComponent firstCompleted = new TextComponent(e.getPlayer().getDisplayName() + " has become the first to complete the advancement ");
+        advancement.setColor(net.md_5.bungee.api.ChatColor.LIGHT_PURPLE);
+        firstCompleted.addExtra(advancement);
+        getServer().spigot().broadcast(firstCompleted);
 
         // Add points to the player
         points.put(e.getPlayer(), points.get(e.getPlayer()) + 1);
