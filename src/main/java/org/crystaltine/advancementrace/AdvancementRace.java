@@ -1,5 +1,6 @@
 package org.crystaltine.advancementrace;
 
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -62,13 +63,16 @@ public final class AdvancementRace extends JavaPlugin implements Listener {
         }
 
         TextComponent advancement = new TextComponent("[" + Objects.requireNonNull(e.getAdvancement().getDisplay()).getTitle() + "]");
-        advancement.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new ComponentBuilder(e.getAdvancement().getDisplay().getTitle() + "\n" + e.getAdvancement().getDisplay().getDescription()).create()));
+        BaseComponent[] hover = new ComponentBuilder(e.getAdvancement().getDisplay().getTitle() + "\n" + e.getAdvancement().getDisplay().getDescription()).create();
+        advancement.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover));
 
         // If the advancement has already been completed
         if (completedAdvs.contains(e.getAdvancement())) {
             TextComponent alreadyCompleted = new TextComponent(e.getPlayer().getDisplayName() + " has completed the already-obtained advancement ");
             advancement.setColor(net.md_5.bungee.api.ChatColor.GREEN);
+            for(BaseComponent b : hover){
+                b.setColor(net.md_5.bungee.api.ChatColor.GREEN);
+            }
             alreadyCompleted.addExtra(advancement);
             getServer().spigot().broadcast(alreadyCompleted);
             return;
@@ -78,6 +82,9 @@ public final class AdvancementRace extends JavaPlugin implements Listener {
         completedAdvs.add(e.getAdvancement());
         TextComponent firstCompleted = new TextComponent(e.getPlayer().getDisplayName() + " has become the first to complete the advancement ");
         advancement.setColor(net.md_5.bungee.api.ChatColor.LIGHT_PURPLE);
+        for(BaseComponent b : hover){
+            b.setColor(net.md_5.bungee.api.ChatColor.LIGHT_PURPLE);
+        }
         firstCompleted.addExtra(advancement);
         getServer().spigot().broadcast(firstCompleted);
 
