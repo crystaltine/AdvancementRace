@@ -1,6 +1,5 @@
 package org.crystaltine.advancementrace;
 
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -13,10 +12,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.scoreboard.Criteria;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +24,8 @@ public final class AdvancementRace extends JavaPlugin implements Listener {
     HashMap<Player, Integer> points = new HashMap<Player, Integer>();
 
     boolean gameStarted = false;
+
+    AdvRaceScoreboard scoreboardThingy = new AdvRaceScoreboard(points, this);
 
     @Override
     public void onEnable() {
@@ -61,7 +58,7 @@ public final class AdvancementRace extends JavaPlugin implements Listener {
         // If the advancement has already been completed
         if (completedAdvs.contains(e.getAdvancement())) {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.sendMessage(e.getPlayer().getDisplayName() + " has completed the already-obtained advancement [" + ChatColor.GREEN + e.getAdvancement().getKey().getKey() + "]");
+                p.sendMessage(e.getPlayer().getDisplayName() + " has completed the already-obtained advancement " + ChatColor.GREEN + "[" + e.getAdvancement().getDisplay() + "]");
             }
             return;
         }
@@ -69,7 +66,7 @@ public final class AdvancementRace extends JavaPlugin implements Listener {
         // Else, that means the advancement has not been completed
         completedAdvs.add(e.getAdvancement());
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.sendMessage( e.getPlayer().getDisplayName() + " has become the first to complete the advancement [" + ChatColor.LIGHT_PURPLE + e.getAdvancement().getKey().getKey() + "]");
+            p.sendMessage( e.getPlayer().getDisplayName() + " has become the first to complete the advancement " + ChatColor.LIGHT_PURPLE + "[" + e.getAdvancement().getDisplay() + "]");
         }
 
         // Add points to the player
@@ -101,6 +98,8 @@ public final class AdvancementRace extends JavaPlugin implements Listener {
             // Turn AnnounceAdvancements off since we are using a custom message
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "gamerule announceAdvancements false");
 
+            scoreboardThingy.
+
             for (Player p : Bukkit.getOnlinePlayers()) {
                 points.put(p, 0);
                 // revoke all advancements
@@ -116,59 +115,5 @@ public final class AdvancementRace extends JavaPlugin implements Listener {
             return true;
         }
         return false;
-    }
-}
-
-class AdvRaceScoreboard {
-
-    private final HashMap<Player, Integer> points;
-    private final Objective objective;
-
-    /**
-     * Creates a new instance of the scoreboard object.
-     *
-     * @param points Pointer to the points hashmap
-     *
-     * @throws NullPointerException if the scoreboard manager is null (error while creating the scoreboard)
-     */
-    public AdvRaceScoreboard(HashMap<Player, Integer> points) {
-        this.points = points;
-        ScoreboardManager manager = Bukkit.getScoreboardManager();
-
-        if (manager == null) {
-            System.out.println("Scoreboard manager is null");
-            throw new NullPointerException();
-        }
-
-        final Scoreboard board = manager.getNewScoreboard();
-
-        Criteria criteria = Criteria.DUMMY;
-
-        this.objective = board.registerNewObjective("AdvancementRace", criteria, "Advancement");
-    }
-
-    // TODO
-    @EventHandler
-    public void PlayerJoin(PlayerJoinEvent e) {
-        final Player p = e.getPlayer();
-        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.plugin, new Runnable() {
-            public void run() {
-                ScoreboardManager manager = Bukkit.getScoreboardManager();
-                final Scoreboard board = manager.getNewScoreboard();
-                final Objective objective = board.registerNewObjective("test", "dummy");
-                objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-                objective.setDisplayName(ChatColor.RED + "YourScoreboardTitle");
-                Score score = objective.getScore("Score10");
-                score.setScore(10);
-                Score score1 = objective.getScore("Score9");
-                score1.setScore(9);
-                Score score2 = objective.getScore("Score8");
-                score2.setScore(8);
-                Score score3 = objective.getScore("§6Colors");
-                score3.setScore(7);
-                p.setScoreboard(board);
-            }
-        },0, 20 * 10);
-
     }
 }
