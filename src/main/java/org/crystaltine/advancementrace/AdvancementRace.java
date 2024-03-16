@@ -25,7 +25,7 @@ public final class AdvancementRace extends JavaPlugin implements Listener {
 
     boolean gameStarted = false;
 
-    AdvRaceScoreboard scoreboardThingy = new AdvRaceScoreboard(points, this);
+    AdvRaceScoreboard scoreboardThingy = new AdvRaceScoreboard(points);
 
     @Override
     public void onEnable() {
@@ -80,6 +80,10 @@ public final class AdvancementRace extends JavaPlugin implements Listener {
             }
             gameStarted = false;
         }
+
+        //Update scoreboard
+        scoreboardThingy.updateScoreboard();
+        scoreboardThingy.displayForPlayers();
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -98,7 +102,8 @@ public final class AdvancementRace extends JavaPlugin implements Listener {
             // Turn AnnounceAdvancements off since we are using a custom message
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "gamerule announceAdvancements false");
 
-            scoreboardThingy.
+            scoreboardThingy.updateScoreboard();
+            scoreboardThingy.displayForPlayers();
 
             for (Player p : Bukkit.getOnlinePlayers()) {
                 points.put(p, 0);

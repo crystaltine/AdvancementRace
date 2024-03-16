@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.*;
@@ -17,7 +18,7 @@ public class AdvRaceScoreboard {
     private final Scoreboard board;
     private final Objective objective;
 
-    private final Plugin plugin;
+    //private final Plugin plugin;
 
     /**
      * Creates a new instance of the scoreboard object.
@@ -26,10 +27,10 @@ public class AdvRaceScoreboard {
      *
      * @throws NullPointerException if the scoreboard manager is null (error while creating the scoreboard)
      */
-    public AdvRaceScoreboard(HashMap<Player, Integer> points, Plugin plugin) {
+    public AdvRaceScoreboard(HashMap<Player, Integer> points) {
         this.points = points;
         this.manager = Bukkit.getScoreboardManager();
-        this.plugin = plugin;
+        //this.plugin = plugin;
 
         if (manager == null) {
             System.out.println("Scoreboard manager is null");
@@ -38,17 +39,7 @@ public class AdvRaceScoreboard {
 
         this.board = manager.getNewScoreboard();
         this.objective = board.registerNewObjective("AdvancementRace", Criteria.DUMMY, "Advancement");
-    }
-
-    @EventHandler
-    public void PlayerJoin(PlayerJoinEvent e) {
-        final Player p = e.getPlayer();
-        final Scoreboard board = this.board;
-        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this.plugin, new Runnable() {
-            public void run() {
-                p.setScoreboard(board);
-            }
-        },0, 20 * 10);
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
     public void displayForPlayers() {
